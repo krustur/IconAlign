@@ -1,5 +1,6 @@
 # Build output
-#"r"
+r
+IconAlign
 
 # Prerequisites
 *.d
