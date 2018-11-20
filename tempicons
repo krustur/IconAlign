@@ -1,0 +1,2 @@
+makedir ram:sys
+copy a-system:#?.info ram:sys/
