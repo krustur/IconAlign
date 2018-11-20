@@ -17,6 +17,7 @@
 
 // TODO: Padding
 // TODO: Parameters for padding and alignment
+// TODO: Align bottom, not top!
 // TODO: Readme.md
 // TODO: Readme for Amiga
 // TODO: Pack
@@ -298,6 +299,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         Verbose(" do_CurrentX: %li\n", diskObject->do_CurrentX);
         Verbose(" do_CurrentY: %li\n", diskObject->do_CurrentY);
         // Verbose(" Width: %hi\n", diskObject->);
+        Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
+        Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
         Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
         Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
         // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
@@ -313,28 +316,20 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
             return 0;
         }
 
-
-
         short xaligned = FALSE;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            // Information("Skip X \"%s\" - no icon position for X\n");
             long currx = diskObject->do_CurrentX + (XAlignment / 2);
             long newx = currx - (currx % XAlignment);
             if (newx != diskObject->do_CurrentX)
             {
                 xaligned = TRUE;
             }
-            // printf("change x from %li to %li\n", currx, newx);
             diskObject->do_CurrentX = newx;
-            // long XAlignment = 16;
-            // long YAlignment = 16;
         }
         short yaligned = FALSE;
         if (diskObject->do_CurrentY != NO_ICON_POSITION)
         {
-            // Information("Skip Y \"%s\" - no icon position for Y\n");
-            // TODO: Align bottom, not top!
             long curry = diskObject->do_CurrentY + (YAlignment / 2);
             long newy = curry - (curry % YAlignment);
             if (newy != diskObject->do_CurrentY)
