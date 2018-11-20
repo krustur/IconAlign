@@ -15,6 +15,15 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
+// TODO: Padding
+// TODO: Parameters for padding and alignment
+// TODO: Readme.md
+// TODO: Readme for Amiga
+// TODO: Pack
+// TODO: Upload to Aminet
+// TODO: Scripted tests!
+
+
 // VBCC
 extern size_t __stack_usage;
 
