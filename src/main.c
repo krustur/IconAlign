@@ -304,6 +304,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
             return 0;
         }
 
+
+
         short xaligned = FALSE;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
