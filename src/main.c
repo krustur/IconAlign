@@ -15,9 +15,7 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
-// TODO: Parameters for alignment
 // TODO: Align devision by zero protection
-// TODO: Align bottom, not top!
 // TODO: Readme.md
 // TODO: Readme for Amiga
 // TODO: Pack
