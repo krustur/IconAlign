@@ -15,7 +15,7 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
-// TODO: Parameters for padding and alignment
+// TODO: Parameters for alignment
 // TODO: Align devision by zero protection
 // TODO: Align bottom, not top!
 // TODO: Readme.md
@@ -23,6 +23,10 @@
 // TODO: Pack
 // TODO: Upload to Aminet
 // TODO: Scripted tests!
+
+// C helpers
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 // VBCC
 extern size_t __stack_usage;
@@ -58,11 +62,12 @@ void StringToLower(char *str, unsigned int strLen, unsigned int offset);
 // Icon alignment
 long PaddingLeft = 4;
 long PaddingTop = 4;
-long XAlignment = 16;
-long YAlignment = 16;
+long AlignX = 16;
+long AlignY = 16;
 unsigned int AlignCurrentWorkingDir();
 unsigned int AlignDir(unsigned char *diskObjectName);
 unsigned int AlignIcon(unsigned char *diskObjectName);
+long Align(long orig, long pad, long align, long alignoffset);
 
 int main(int argc, char **argv)
 {
@@ -88,15 +93,20 @@ int main(int argc, char **argv)
     unsigned char DIR_OPTION_POS = 1;
     unsigned char PADLEFT_OPTION_POS = 2;
     unsigned char PADTOP_OPTION_POS = 3;
-    unsigned char VERBOSE_OPTION_POS = 4;
+    unsigned char ALIGNX_OPTION_POS = 4;
+    unsigned char ALIGNY_OPTION_POS = 5;
+
+    unsigned char VERBOSE_OPTION_POS = 6;
     long argArray[] =
         {
             0,
             0,
             0,
             0,
+            0,
+            0,
             0};
-    struct RDArgs *rdargs = ReadArgs("FILE/K,DIR/K,PADLEFT/N,PADTOP/N,VERBOSE/S", argArray, NULL);
+    struct RDArgs *rdargs = ReadArgs("FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,VERBOSE/S", argArray, NULL);
 
     if (!rdargs)
     {
@@ -133,8 +143,19 @@ int main(int argc, char **argv)
         PaddingTop = *(long *)argArray[PADTOP_OPTION_POS];
     }
 
+    if ((long *)argArray[ALIGNX_OPTION_POS] != NULL)
+    {
+        AlignX = *(long *)argArray[ALIGNX_OPTION_POS];
+    }
+    if ((long *)argArray[ALIGNY_OPTION_POS] != NULL)
+    {
+        AlignY = *(long *)argArray[ALIGNY_OPTION_POS];
+    }
+
     Verbose(" PADLEFT %li\n", PaddingLeft);
     Verbose(" PADTOP %li\n", PaddingTop);
+    Verbose(" ALIGNX %li\n", AlignX);
+    Verbose(" ALIGNY %li\n", AlignY);
     // if (!fileOption && !folderOption)
     // {
     //     Information("please provide FILE or FOLDER option\n");
@@ -341,22 +362,28 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         }
 
         short xaligned = FALSE;
+        long origx = diskObject->do_CurrentX;
+        long newx;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            long currx = (diskObject->do_CurrentX - PaddingLeft) + (XAlignment / 2);
-            long newx = PaddingLeft + currx - (currx % XAlignment);
-            if (newx != diskObject->do_CurrentX)
+            newx = Align(origx, PaddingLeft, AlignX, 0);
+            // long currx = (origx - PaddingLeft) + (AlignX / 2);
+            // newx = PaddingLeft + currx - (currx % AlignX);
+            if (newx != origx)
             {
                 xaligned = TRUE;
             }
             diskObject->do_CurrentX = newx;
         }
         short yaligned = FALSE;
+        long origy = diskObject->do_CurrentY;
+        long newy;
         if (diskObject->do_CurrentY != NO_ICON_POSITION)
         {
-            long curry = (diskObject->do_CurrentY - PaddingTop) + (YAlignment / 2);
-            long newy = PaddingTop + curry - (curry % YAlignment);
-            if (newy != diskObject->do_CurrentY)
+            newy = Align(origy, PaddingTop, AlignY, diskObject->do_Gadget.Height);
+            // long curry = (origy - PaddingTop) + (AlignY / 2);
+            // newy = PaddingTop + curry - (curry % AlignY);
+            if (newy != origy)
             {
                 yaligned = TRUE;
                 diskObject->do_CurrentY = newy;
@@ -372,9 +399,42 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         PutDiskObject(diskObjectName, diskObject);
         FreeDiskObject(diskObject);
 
-        Information("Aligend \"%s\"\n", diskObjectName);
+        Information("Aligend \"%s\" (%i,%i) to (%i,%i)\n",
+                    diskObjectName,
+                    origx, origy,
+                    newx, newy);
         return 1;
     }
     Verbose("Skipped \"%s\" - icon not found\n", diskObjectName);
     return 0;
 }
+
+long Align(long orig, long pad, long align, long alignoffset)
+{
+    // printf("align %li %li %li %li\n", orig, pad, align, alignoffset);
+    long max = MAX(alignoffset,(orig + alignoffset - pad));
+    // printf("max %li\n", max);
+
+    long temp = max + (align / 2);
+    long alignedunpadded = temp - (temp % align);
+    // printf("alignedunpadded %li\n", alignedunpadded);
+    long aligned = alignedunpadded + pad - alignoffset;
+    // printf("aligned %li\n", aligned);
+    // printf("\n");
+    return aligned;
+}
+
+// long Align(long orig, long pad, long align, long alignoffset)
+// {
+//     // printf("align %li %li %li\n", orig, pad, align);
+//     long max = MAX(0,(orig - pad));
+//     // printf("max %li\n", max);
+
+//     long temp = max + alignoffset + (align / 2);
+//     long alignedunpadded = temp - (temp % align);
+//     // printf("alignedunpadded %li\n", alignedunpadded);
+//     long aligned = alignedunpadded - alignoffset + PaddingLeft;
+//     // printf("aligned %li\n", aligned);
+//     // printf("\n");
+//     return aligned;
+// }
