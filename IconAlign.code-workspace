@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.s": "m68k",
+			"startup.h": "c",
+			"types.h": "c",
+			"dos.h": "c",
+			"workbench.h": "c",
+			"tasks.h": "c",
+			"lists.h": "c",
+			"icon.h": "c",
+			"icon_pragmas.h": "c",
+			"icon_protos.h": "c",
+			"icon_lib.h": "c",
+			"exec_protos.h": "c",
+			"dos_pragmas.h": "c",
+			"dos_protos.h": "c",
+			"exec.h": "c",
+			"exec_pragmas.h": "c",
+			"dirent.h": "c",
+			"unistd.h": "c"
+		}
+	}
+}

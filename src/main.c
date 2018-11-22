@@ -16,13 +16,13 @@
 #include <unistd.h>
 
 // TODO: Parameters for padding and alignment
+// TODO: Align devision by zero protection
 // TODO: Align bottom, not top!
 // TODO: Readme.md
 // TODO: Readme for Amiga
 // TODO: Pack
 // TODO: Upload to Aminet
 // TODO: Scripted tests!
-
 
 // VBCC
 extern size_t __stack_usage;
@@ -56,8 +56,8 @@ short StringEndsWith(const char *str, const char *suffix);
 void StringToLower(char *str, unsigned int strLen, unsigned int offset);
 
 // Icon alignment
-long LeftPadding = 4;
-long TopPadding = 4;
+long PaddingLeft = 4;
+long PaddingTop = 4;
 long XAlignment = 16;
 long YAlignment = 16;
 unsigned int AlignCurrentWorkingDir();
@@ -73,6 +73,7 @@ int main(int argc, char **argv)
         Information("Failed to open dos.library 40\n");
         return RETURN_ERROR;
     }
+    // Verbose("DosBase: %p\n", (void *)DosBase);
 
     IconBase = OpenLibrary("icon.library", 45L);
     if (!IconBase)
@@ -80,36 +81,60 @@ int main(int argc, char **argv)
         Information("Failed to open icon.library 45\n");
         return RETURN_ERROR;
     }
+    // Verbose("IconBase: %p\n", (void *)IconBase);
 
     // check arguments
+    unsigned char FILE_OPTION_POS = 0;
+    unsigned char DIR_OPTION_POS = 1;
+    unsigned char PADLEFT_OPTION_POS = 2;
+    unsigned char PADTOP_OPTION_POS = 3;
+    unsigned char VERBOSE_OPTION_POS = 4;
     long argArray[] =
         {
             0,
-            // 0,
+            0,
+            0,
+            0,
             0};
-    struct RDArgs *rdargs = ReadArgs("FILE/K,DIR/K,VERBOSE/S", argArray, NULL);
+    struct RDArgs *rdargs = ReadArgs("FILE/K,DIR/K,PADLEFT/N,PADTOP/N,VERBOSE/S", argArray, NULL);
+
     if (!rdargs)
     {
-        // GetFa
         PrintFault(IoErr(), NULL);
         return RETURN_ERROR;
     }
 
-    verbose = argArray[2] == DOSTRUE;
+    verbose = argArray[VERBOSE_OPTION_POS] == DOSTRUE;
     if (verbose)
     {
         Verbose(" VERBOSE logging active\n");
     }
-    STRPTR fileOption = (STRPTR)argArray[0];
+    Verbose("Build platform: %s\n", BuildPlatform);
+    Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
+
+    unsigned char *fileOption = (unsigned char *)argArray[FILE_OPTION_POS];
     if (fileOption)
     {
         Verbose(" FILE=[%s]\n", fileOption);
     }
-    unsigned char *dirOption = (unsigned char *)argArray[1];
+
+    unsigned char *dirOption = (unsigned char *)argArray[DIR_OPTION_POS];
     if (dirOption)
     {
         Verbose(" DIR=[%s]\n", dirOption);
     }
+
+    if ((long *)argArray[PADLEFT_OPTION_POS] != NULL)
+    {
+        PaddingLeft = *(long *)argArray[PADLEFT_OPTION_POS];
+    }
+    if ((long *)argArray[PADTOP_OPTION_POS] != NULL)
+    {
+        PaddingTop = *(long *)argArray[PADTOP_OPTION_POS];
+    }
+
+    Verbose(" PADLEFT %li\n", PaddingLeft);
+    Verbose(" PADTOP %li\n", PaddingTop);
     // if (!fileOption && !folderOption)
     // {
     //     Information("please provide FILE or FOLDER option\n");
@@ -119,6 +144,7 @@ int main(int argc, char **argv)
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
     {
+        // usage: IconAlign
         fixCount = AlignCurrentWorkingDir();
     }
     else if (fileOption)
@@ -130,6 +156,7 @@ int main(int argc, char **argv)
         size_t dirOptionLen = strlen(dirOption);
         if (dirOptionLen == 0)
         {
+            // usage: IconAlign DIR ""
             fixCount = AlignCurrentWorkingDir();
         }
         else
@@ -153,13 +180,8 @@ int main(int argc, char **argv)
     {
         FreeArgs(rdargs);
     }
+    CloseLibrary(DosBase);
     CloseLibrary(IconBase);
-
-    Verbose("Build platform: %s\n", BuildPlatform);
-    Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
-    // Verbose("IconBase: %p\n", (void *)IconBase);
-    // Verbose("SysBase: %p\n", (void *)SysBase);
-    Verbose("DosBase: %p\n", (void *)DosBase);
 
     return RETURN_OK;
 }
@@ -239,19 +261,20 @@ unsigned int AlignDir(unsigned char *dirName)
         Information("path \"%s\" is too long - skipping!\n", dirName);
         return 0;
     }
+    unsigned char fixedDirName[PATH_MAX];
+    strcpy(fixedDirName, dirName);
     if (!StringEndsWith(dirName, "/") && !StringEndsWith(dirName, ":"))
     {
         Verbose("Appending \"/\" to dir\n");
-        unsigned char fixedDirName[PATH_MAX];
-        strcpy(fixedDirName, dirName);
+
         fixedDirName[dirNameLen] = '/';
         fixedDirName[dirNameLen + 1] = 0;
-        dirName = fixedDirName;
         dirNameLen += 1;
+        Verbose("Fixed dir \"%s\"\n", fixedDirName);
     }
 
     unsigned int fixCount = 0;
-    DIR *dir = opendir(dirName);
+    DIR *dir = opendir(fixedDirName);
     struct dirent *direntry;
     if (dir)
     {
@@ -267,7 +290,7 @@ unsigned int AlignDir(unsigned char *dirName)
             else
             {
                 unsigned char fullPath[PATH_MAX];
-                strcpy(fullPath, dirName);
+                strcpy(fullPath, fixedDirName);
                 strcat(fullPath, direntry->d_name);
                 StringToLower(fullPath, fullLen, fullLen - 4);
                 if (StringEndsWith(fullPath, ".info"))
@@ -320,8 +343,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         short xaligned = FALSE;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            long currx = (diskObject->do_CurrentX - LeftPadding) + (XAlignment / 2);
-            long newx = LeftPadding + currx - (currx % XAlignment);
+            long currx = (diskObject->do_CurrentX - PaddingLeft) + (XAlignment / 2);
+            long newx = PaddingLeft + currx - (currx % XAlignment);
             if (newx != diskObject->do_CurrentX)
             {
                 xaligned = TRUE;
@@ -331,8 +354,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         short yaligned = FALSE;
         if (diskObject->do_CurrentY != NO_ICON_POSITION)
         {
-            long curry = (diskObject->do_CurrentY -TopPadding) + (YAlignment / 2);
-            long newy = TopPadding + curry - (curry % YAlignment);
+            long curry = (diskObject->do_CurrentY - PaddingTop) + (YAlignment / 2);
+            long newy = PaddingTop + curry - (curry % YAlignment);
             if (newy != diskObject->do_CurrentY)
             {
                 yaligned = TRUE;
@@ -345,7 +368,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
             Information("Already aligned \"%s\"\n", diskObjectName);
             return 0;
         }
-        
+
         PutDiskObject(diskObjectName, diskObject);
         FreeDiskObject(diskObject);
 
