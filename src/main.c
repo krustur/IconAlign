@@ -15,7 +15,6 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
-// TODO: Padding
 // TODO: Parameters for padding and alignment
 // TODO: Align bottom, not top!
 // TODO: Readme.md
@@ -57,6 +56,8 @@ short StringEndsWith(const char *str, const char *suffix);
 void StringToLower(char *str, unsigned int strLen, unsigned int offset);
 
 // Icon alignment
+long LeftPadding = 4;
+long TopPadding = 4;
 long XAlignment = 16;
 long YAlignment = 16;
 unsigned int AlignCurrentWorkingDir();
@@ -319,8 +320,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         short xaligned = FALSE;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            long currx = diskObject->do_CurrentX + (XAlignment / 2);
-            long newx = currx - (currx % XAlignment);
+            long currx = (diskObject->do_CurrentX - LeftPadding) + (XAlignment / 2);
+            long newx = LeftPadding + currx - (currx % XAlignment);
             if (newx != diskObject->do_CurrentX)
             {
                 xaligned = TRUE;
@@ -330,8 +331,8 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         short yaligned = FALSE;
         if (diskObject->do_CurrentY != NO_ICON_POSITION)
         {
-            long curry = diskObject->do_CurrentY + (YAlignment / 2);
-            long newy = curry - (curry % YAlignment);
+            long curry = (diskObject->do_CurrentY -TopPadding) + (YAlignment / 2);
+            long newy = TopPadding + curry - (curry % YAlignment);
             if (newy != diskObject->do_CurrentY)
             {
                 yaligned = TRUE;
