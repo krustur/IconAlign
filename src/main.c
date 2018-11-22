@@ -20,7 +20,10 @@
 // TODO: Readme for Amiga
 // TODO: Pack
 // TODO: Upload to Aminet
+// TODO: Align via .backdrop-file
 // TODO: Scripted tests!
+// BUG: Can't rename single file
+// BUG: Can't rename single file from it's file.info  file
 
 // C helpers
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -364,7 +367,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         long newx;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            newx = Align(origx, PaddingLeft, AlignX, 0);
+            newx = Align(origx, PaddingLeft, AlignX, diskObject->do_Gadget.Width / 2);
             // long currx = (origx - PaddingLeft) + (AlignX / 2);
             // newx = PaddingLeft + currx - (currx % AlignX);
             if (newx != origx)
