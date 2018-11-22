@@ -15,7 +15,6 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
-// TODO: Align devision by zero protection
 // TODO: Readme.md
 // TODO: Readme for Amiga
 // TODO: Pack
@@ -24,6 +23,7 @@
 // TODO: Scripted tests!
 // BUG: Can't rename single file
 // BUG: Can't rename single file from it's file.info  file
+// BUG: Problems reading some icons width/heigth information
 
 // C helpers
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -162,6 +162,12 @@ int main(int argc, char **argv)
     //     Information("please provide FILE or FOLDER option\n");
     //     return RETURN_ERROR;
     // }
+
+    if (AlignX == 0 || AlignY == 0)
+    {
+        Information("Can't align to 0\n");
+        return RETURN_ERROR;
+    }
 
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
