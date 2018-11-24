@@ -55,8 +55,10 @@ unsigned char PADLEFT_OPTION_POS = 2;
 unsigned char PADTOP_OPTION_POS = 3;
 unsigned char ALIGNX_OPTION_POS = 4;
 unsigned char ALIGNY_OPTION_POS = 5;
+unsigned char CENTERX_OPTION_POS = 6;
+unsigned char BOTTOMY_OPTION_POS = 7;
 
-unsigned char VERBOSE_OPTION_POS = 6;
+unsigned char VERBOSE_OPTION_POS = 8;
 long argArray[] =
     {
         0,
@@ -65,8 +67,10 @@ long argArray[] =
         0,
         0,
         0,
+        0,
+        0,
         0};
-unsigned char argumentString[] = "FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,VERBOSE/S";
+unsigned char argumentString[] = "FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,CENTERX/S,BOTTOMY/S,VERBOSE/S";
 
 // Logging
 short verbose = FALSE;
@@ -83,6 +87,8 @@ long PaddingLeft = 4;
 long PaddingTop = 4;
 long AlignX = 16;
 long AlignY = 16;
+short CenterX = FALSE;
+short BottomY = FALSE;
 unsigned int AlignCurrentWorkingDir();
 unsigned int AlignDir(unsigned char *diskObjectName);
 unsigned int AlignIcon(unsigned char *diskObjectName);
@@ -154,10 +160,15 @@ int main(int argc, char **argv)
         AlignY = *(long *)argArray[ALIGNY_OPTION_POS];
     }
 
+    CenterX = argArray[CENTERX_OPTION_POS] == DOSTRUE;
+    BottomY = argArray[BOTTOMY_OPTION_POS] == DOSTRUE;
+
     Verbose(" PADLEFT %li\n", PaddingLeft);
     Verbose(" PADTOP %li\n", PaddingTop);
     Verbose(" ALIGNX %li\n", AlignX);
     Verbose(" ALIGNY %li\n", AlignY);
+    Verbose(" CENTERX %hi\n", CenterX);
+    Verbose(" BOTTOMY %hi\n", BottomY);
     // if (!fileOption && !folderOption)
     // {
     //     Information("please provide FILE or FOLDER option\n");
@@ -390,7 +401,14 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         long newx;
         if (diskObject->do_CurrentX != NO_ICON_POSITION)
         {
-            newx = Align(origx, PaddingLeft, AlignX, diskObject->do_Gadget.Width / 2);
+            if (CenterX)
+            {
+                newx = Align(origx, PaddingLeft, AlignX, diskObject->do_Gadget.Width / 2);
+            }
+            else
+            {
+                newx = Align(origx, PaddingLeft, AlignX, 0);
+            }
             // long currx = (origx - PaddingLeft) + (AlignX / 2);
             // newx = PaddingLeft + currx - (currx % AlignX);
             if (newx != origx)
@@ -404,7 +422,14 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         long newy;
         if (diskObject->do_CurrentY != NO_ICON_POSITION)
         {
-            newy = Align(origy, PaddingTop, AlignY, diskObject->do_Gadget.Height);
+            if (BottomY)
+            {
+                newy = Align(origy, PaddingTop, AlignY, diskObject->do_Gadget.Height);
+            }
+            else
+            {
+                newy = Align(origy, PaddingTop, AlignY, 0);
+            }
             // long curry = (origy - PaddingTop) + (AlignY / 2);
             // newy = PaddingTop + curry - (curry % AlignY);
             if (newy != origy)
