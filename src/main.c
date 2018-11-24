@@ -34,7 +34,7 @@ extern size_t __stack_usage;
 
 // Version tag
 #define VERSTAG "\0$VER: IconAlign 0.1 (18.11.2018)"
-UBYTE versiontag[] = VERSTAG;
+unsigned char versiontag[] = VERSTAG;
 
 // Build Platform
 #ifdef BUILD_PLATFORM_AMIGA
@@ -49,6 +49,26 @@ const char *BuildPlatform = "Unknown";
 // int _IconBaseVer = 45;
 struct Library *DosBase = NULL;
 struct Library *IconBase = NULL;
+
+// Arguments
+unsigned char FILE_OPTION_POS = 0;
+unsigned char DIR_OPTION_POS = 1;
+unsigned char PADLEFT_OPTION_POS = 2;
+unsigned char PADTOP_OPTION_POS = 3;
+unsigned char ALIGNX_OPTION_POS = 4;
+unsigned char ALIGNY_OPTION_POS = 5;
+
+unsigned char VERBOSE_OPTION_POS = 6;
+long argArray[] =
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0};
+unsigned char argumentString[] = "FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,VERBOSE/S";
 
 // Logging
 short verbose = FALSE;
@@ -90,24 +110,8 @@ int main(int argc, char **argv)
     // Verbose("IconBase: %p\n", (void *)IconBase);
 
     // check arguments
-    unsigned char FILE_OPTION_POS = 0;
-    unsigned char DIR_OPTION_POS = 1;
-    unsigned char PADLEFT_OPTION_POS = 2;
-    unsigned char PADTOP_OPTION_POS = 3;
-    unsigned char ALIGNX_OPTION_POS = 4;
-    unsigned char ALIGNY_OPTION_POS = 5;
 
-    unsigned char VERBOSE_OPTION_POS = 6;
-    long argArray[] =
-        {
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0};
-    struct RDArgs *rdargs = ReadArgs("FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,VERBOSE/S", argArray, NULL);
+    struct RDArgs *rdargs = ReadArgs(argumentString, argArray, NULL);
 
     if (!rdargs)
     {
@@ -121,7 +125,6 @@ int main(int argc, char **argv)
         Verbose(" VERBOSE logging active\n");
     }
     Verbose("Build platform: %s\n", BuildPlatform);
-    Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
 
     unsigned char *fileOption = (unsigned char *)argArray[FILE_OPTION_POS];
     if (fileOption)
@@ -211,6 +214,8 @@ int main(int argc, char **argv)
     CloseLibrary(DosBase);
     CloseLibrary(IconBase);
 
+    Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
+
     return RETURN_OK;
 }
 
@@ -272,12 +277,15 @@ void StringToLower(char *str, unsigned int strLen, unsigned int offset)
 // Icon management
 unsigned int AlignCurrentWorkingDir()
 {
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    unsigned int fixCount = 0;
+    char *currentWorkingDir = malloc(PATH_MAX);
+    //printf("sizeof(cwd): %ld\n",sizeof(cwd));
+    if (getcwd(currentWorkingDir, PATH_MAX) != NULL)
     {
-        Verbose("Using current working dir: %s\n", cwd);
+        Verbose("Using current working dir: %s\n", currentWorkingDir);
+        fixCount = AlignDir(currentWorkingDir);
     }
-    unsigned int fixCount = AlignDir(cwd);
+    free(currentWorkingDir);
     return fixCount;
 }
 
@@ -289,7 +297,7 @@ unsigned int AlignDir(unsigned char *dirName)
         Information("path \"%s\" is too long - skipping!\n", dirName);
         return 0;
     }
-    unsigned char fixedDirName[PATH_MAX];
+    unsigned char *fixedDirName = malloc(PATH_MAX);
     strcpy(fixedDirName, dirName);
     if (!StringEndsWith(dirName, "/") && !StringEndsWith(dirName, ":"))
     {
@@ -317,7 +325,7 @@ unsigned int AlignDir(unsigned char *dirName)
             }
             else
             {
-                unsigned char fullPath[PATH_MAX];
+                unsigned char *fullPath = malloc(PATH_MAX);
                 strcpy(fullPath, fixedDirName);
                 strcat(fullPath, direntry->d_name);
                 StringToLower(fullPath, fullLen, fullLen - 4);
@@ -327,11 +335,13 @@ unsigned int AlignDir(unsigned char *dirName)
                     // Verbose("fullPath: %s\n", fullPath);
                     fixCount += AlignIcon(fullPath);
                 }
+                free(fullPath);
             }
             //printf("%s\n", direntry->d_name);
         }
         closedir(dir);
     }
+    free(fixedDirName);
     return fixCount;
 }
 
@@ -419,7 +429,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
 long Align(long orig, long pad, long align, long alignoffset)
 {
     // printf("align %li %li %li %li\n", orig, pad, align, alignoffset);
-    long max = MAX(alignoffset,(orig + alignoffset - pad));
+    long max = MAX(alignoffset, (orig + alignoffset - pad));
     // printf("max %li\n", max);
 
     long temp = max + (align / 2);
