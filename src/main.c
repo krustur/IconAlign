@@ -21,8 +21,6 @@
 // TODO: Upload to Aminet
 // TODO: Align via .backdrop-file
 // TODO: Scripted tests!
-// BUG: Can't rename single file
-// BUG: Can't rename single file from it's file.info  file
 // BUG: Problems reading some icons width/heigth information
 
 // C helpers
@@ -331,7 +329,6 @@ unsigned int AlignDir(unsigned char *dirName)
                 StringToLower(fullPath, fullLen, fullLen - 4);
                 if (StringEndsWith(fullPath, ".info"))
                 {
-                    fullPath[fullLen - 5] = 0;
                     // Verbose("fullPath: %s\n", fullPath);
                     fixCount += AlignIcon(fullPath);
                 }
@@ -347,10 +344,19 @@ unsigned int AlignDir(unsigned char *dirName)
 
 unsigned int AlignIcon(unsigned char *diskObjectName)
 {
-    struct DiskObject *diskObject = GetDiskObject(diskObjectName);
+    unsigned long diskObjectNameLen = strlen(diskObjectName);
+    unsigned char *fixedDiskObjectName = malloc(PATH_MAX);
+    strcpy(fixedDiskObjectName, diskObjectName);
+    StringToLower(fixedDiskObjectName, diskObjectNameLen, diskObjectNameLen - 4);
+    if (StringEndsWith(fixedDiskObjectName, ".info"))
+    {
+        fixedDiskObjectName[diskObjectNameLen - 5] = 0;
+    }
+
+    struct DiskObject *diskObject = GetDiskObject(fixedDiskObjectName);
     if (diskObject)
     {
-        Verbose("Icon found: %s\n", diskObjectName);
+        Verbose("Icon found: %s\n", fixedDiskObjectName);
         // Verbose("do_Magic: %x\n", diskObject->do_Magic);
         // Verbose(" Version: %hi\n", diskObject->do_Version);
         // Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
@@ -374,8 +380,9 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
         {
-            Information("Skip \"%s\" - no icon position\n", diskObjectName);
-            return 0;
+            Information("Skip \"%s\" - no icon position\n", fixedDiskObjectName);
+            free(fixedDiskObjectName);
+            return 1;
         }
 
         short xaligned = FALSE;
@@ -409,20 +416,25 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
 
         if (!xaligned && !yaligned)
         {
-            Information("Already aligned \"%s\"\n", diskObjectName);
-            return 0;
+            Information("Already aligned \"%s\" (%i,%i)\n",
+                        fixedDiskObjectName,
+                        origx, origy);
+            free(fixedDiskObjectName);
+            return 1;
         }
 
-        PutDiskObject(diskObjectName, diskObject);
+        PutDiskObject(fixedDiskObjectName, diskObject);
         FreeDiskObject(diskObject);
 
         Information("Aligend \"%s\" (%i,%i) to (%i,%i)\n",
-                    diskObjectName,
+                    fixedDiskObjectName,
                     origx, origy,
                     newx, newy);
+        free(fixedDiskObjectName);
         return 1;
     }
-    Verbose("Skipped \"%s\" - icon not found\n", diskObjectName);
+    Verbose("Skipped \"%s\" - icon not found\n", fixedDiskObjectName);
+    free(fixedDiskObjectName);
     return 0;
 }
 
