@@ -352,24 +352,24 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
     {
         Verbose("Icon found: %s\n", diskObjectName);
         // Verbose("do_Magic: %x\n", diskObject->do_Magic);
-        Verbose(" Version: %hi\n", diskObject->do_Version);
-        Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
-        Verbose(" do_DefaultTool: %s\n", diskObject->do_DefaultTool);
+        // Verbose(" Version: %hi\n", diskObject->do_Version);
+        // Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
+        // Verbose(" do_DefaultTool: %s\n", diskObject->do_DefaultTool);
         // Verbose("do_DefaultTool: ");
         // Verbose(diskObject->do_DefaultTool);
         // Verbose("\n");
         Verbose(" do_CurrentX: %li\n", diskObject->do_CurrentX);
         Verbose(" do_CurrentY: %li\n", diskObject->do_CurrentY);
         // Verbose(" Width: %hi\n", diskObject->);
-        Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
-        Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
+        // Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
+        // Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
         Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
         Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
         // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
-        Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
-        Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
-        Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
-        Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
+        // Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
+        // Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
+        // Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
+        // Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
 
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
