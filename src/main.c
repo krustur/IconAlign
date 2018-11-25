@@ -431,7 +431,6 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
                 newy = Align(origy, PaddingTop, AlignY, 0);
             }
             // long curry = (origy - PaddingTop) + (AlignY / 2);
-            // test git in vs code
             // newy = PaddingTop + curry - (curry % AlignY);
             if (newy != origy)
             {
