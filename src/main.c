@@ -44,8 +44,9 @@ const char *BuildPlatform = "Unknown";
 #endif
 
 // Libraries
-// int _IconBaseVer = 45;
+unsigned long DosVersion = 37L;
 struct Library *DosBase = NULL;
+unsigned long IconVersion = 37L;
 struct Library *IconBase = NULL;
 
 // Arguments
@@ -97,18 +98,18 @@ long Align(long orig, long pad, long align, long alignoffset);
 int main(int argc, char **argv)
 {
     // Open libraries
-    DosBase = OpenLibrary("dos.library", 40L);
+    DosBase = OpenLibrary("dos.library", DosVersion);
     if (!DosBase)
     {
-        Information("Failed to open dos.library 40\n");
+        Information("Failed to open dos.library %li\n", DosVersion);
         return RETURN_ERROR;
     }
     // Verbose("DosBase: %p\n", (void *)DosBase);
 
-    IconBase = OpenLibrary("icon.library", 45L);
+    IconBase = OpenLibrary("icon.library", IconVersion);
     if (!IconBase)
     {
-        Information("Failed to open icon.library 45\n");
+        Information("Failed to open icon.library %li\n", IconVersion);
         return RETURN_ERROR;
     }
     // Verbose("IconBase: %p\n", (void *)IconBase);
