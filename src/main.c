@@ -19,9 +19,7 @@
 // TODO: Readme for Amiga
 // TODO: Pack
 // TODO: Upload to Aminet
-// TODO: Align via .backdrop-file
 // TODO: Scripted tests!
-// BUG: Problems reading some icons width/heigth information
 
 // C helpers
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))

@@ -1,0 +1,12 @@
+.key version/a
+
+IF EXISTS bin_<version>
+    delete bin_<version> all quiet force
+ENDIF
+makedir bin_<version>
+
+lha -a a bin_<version>/IconSnap.lha IconSnap.readme IconSnap
+
+;delete bin/IconSnap.lha
+;vc -v src/main.c -stack-check -lamiga -lposix -IDev:vbcc_posix/targets/m68k-amigaos/include -LDev:vbcc_posix/targets/m68k-amigaos/lib -DBUILD_PLATFORM_AMIGA  -c99 -o IconSnap 
+;copy IconSnap r

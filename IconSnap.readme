@@ -1,5 +1,13 @@
-# IconSnap
-## About
+Short:        Snap Workbench icons to a virtual grid
+Uploader:     krustur@google.com (Krister Jansson)
+Author:       Krister Jansson
+Type:         util/cli
+Version:      0.2
+Architecture: m68k-amigaos >= 2.0.4
+Distribution: Aminet
+
+About IconSnap:
+
 IconSnap is a command line utility that snaps Workbench icons to a virtual
 grid.
 
@@ -8,7 +16,7 @@ util aids you in your struggles by allowing you to roughly position your
 icons in Workbench any way you want, and then run this util to snap your
 Icons to a given grid.
 
-#### Features
+Features:
 - Snap Workbench icons to grid (x and y individually customizable)
 - Add Padding to left and top (individually customizable)
 - Snap single icon
@@ -16,22 +24,18 @@ Icons to a given grid.
 - Experimental feature: Snap vertically to bottom
 - Experimental feature: Snap horizontally to center
 
-## Version
-```VER: IconSnap 0.2 (26.11.2018)```
+Installation:
 
-## Requirements
-AmigaOS 2.04
-
-## Installation
 Copy IconSnap to C:
 
-## Usage
-Order your Icons in Workbench roughly the way you want them positioned, and 
+Usage:
+
+Order your Icons in Workbench roughly the way you want them positioned, and
 then snapshot their position. After that run this tool and point it to the
 folder containg the Icons to be Snapshot.
 
-### Command line usage
-```
+Command line usage:
+
 IconSnap    FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,
             CENTERX/S,BOTTOMY/S,VERBOSE/S
 
@@ -63,14 +67,13 @@ BOTTOMY/S:  Snap vertically to the bottom of the Icon.
             as expected!
 
 VERBOSE/S:  Active verbose logging. Used for debugging purposes.
-```
 
-### Examples
-```
+Examples:
+
 IconSnap FILE Sys:Disk.info
 IconSnap DIR Sys:Utilities/
-IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY
-```
+IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY 
 
-## Bug reports and Feature requests
-Post your Bug reports and Feature requests [on github](https://github.com/krustur/IconSnap/issues)
+Bug reports and Feature requests:
+Post your Bug reports and Feature requests on github: 
+https://github.com/krustur/IconSnap/issues
