@@ -31,7 +31,7 @@
 extern size_t __stack_usage;
 
 // Version tag
-#define VERSTAG "\0$VER: IconAlign 0.2 (26.11.2018)"
+#define VERSTAG "\0$VER: IconSnap 0.2 (26.11.2018)"
 unsigned char versiontag[] = VERSTAG;
 
 // Build Platform
@@ -184,7 +184,7 @@ int main(int argc, char **argv)
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
     {
-        // usage: IconAlign
+        // usage: IconSnap
         fixCount = AlignCurrentWorkingDir();
     }
     else if (fileOption)
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
         size_t dirOptionLen = strlen(dirOption);
         if (dirOptionLen == 0)
         {
-            // usage: IconAlign DIR ""
+            // usage: IconSnap DIR ""
             fixCount = AlignCurrentWorkingDir();
         }
         else
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
     // if (argc != 2)
     // {
     //     printf("incorrect args!\n");
-    //     printf("usage: IconAlign FILE\n");
+    //     printf("usage: IconSnap FILE\n");
     //     return RETURN_ERROR;
     // }
 
