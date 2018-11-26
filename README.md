@@ -8,8 +8,7 @@ Have you ever felt limited by Workbench's ability to layout the icons? This util
 ```VER: IconSnap 0.2 (26.11.2018)```
 
 ## Requirements
-- dos.library V40
-- icon.library V45
+AmigaOS 2.04
 
 ## Installation
 Copy IconSnap to C:
