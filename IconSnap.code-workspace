@@ -23,7 +23,8 @@
 			"exec.h": "c",
 			"exec_pragmas.h": "c",
 			"dirent.h": "c",
-			"unistd.h": "c"
+			"unistd.h": "c",
+			"intuition.h": "c"
 		}
 	}
 }
