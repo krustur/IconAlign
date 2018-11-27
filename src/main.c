@@ -46,6 +46,7 @@ unsigned long DosVersion = 37L;
 struct Library *DosBase = NULL;
 unsigned long IconVersion = 37L;
 struct Library *IconBase = NULL;
+short iconLibraryV44Enabled = FALSE;
 
 // Arguments
 unsigned char FILE_OPTION_POS = 0;
@@ -128,6 +129,13 @@ int main(int argc, char **argv)
         Verbose(" VERBOSE logging active\n");
     }
     Verbose("Build platform: %s\n", BuildPlatform);
+    Verbose("dos.library version %li\n", DosBase->lib_Version);
+    Verbose("icon.library version %li\n", IconBase->lib_Version);
+    if (IconBase->lib_Version >= 45)
+    {
+        Verbose("Icon library V44 features enabled\n");
+        iconLibraryV44Enabled = TRUE;
+    }
 
     unsigned char *fileOption = (unsigned char *)argArray[FILE_OPTION_POS];
     if (fileOption)
