@@ -1,7 +1,7 @@
 Short:        Snap Workbench icons to a virtual grid
 Uploader:     krustur@google.com (Krister Jansson)
 Author:       Krister Jansson
-Type:         util/cli
+Type:         util/wb
 Version:      0.2
 Architecture: m68k-amigaos >= 2.0.4
 Distribution: Aminet
