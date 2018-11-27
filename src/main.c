@@ -390,10 +390,32 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
         Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
         // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
+        // Verbose(" SelectRender: %p\n", diskObject->do_Gadget.SelectRender);
+        // struct Image *gadgetImage = (struct Image *)(diskObject->do_Gadget.GadgetRender);
+        // Verbose(" gadgetImage Width: %hi\n", gadgetImage->Width);
+        // Verbose(" gadgetImage Height: %hi\n", gadgetImage->Height);
+
+        // struct Image *selectImage = (struct Image *)(diskObject->do_Gadget.SelectRender);
+        // if (selectImage)
+        // {
+        //     Verbose(" selectImage Width: %hi\n", selectImage->Width);
+        //     Verbose(" selectImage Height: %hi\n", selectImage->Height);
+        // }
+        // Verbose(" Flags: %hi\n", diskObject->U);
         // Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
         // Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
         // Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
         // Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
+        // unsigned char *toolType = NULL;
+        // toolType = FindToolType(diskObject->do_ToolTypes, "IM1");
+        // if (toolType)
+        // {
+        //     Verbose("  toolType IM1 = \"%s\"\n", toolType);
+        // }
+        // else
+        // {
+        //     Verbose("  toolType IM1 not found :'(\n", toolType);
+        // }
 
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
