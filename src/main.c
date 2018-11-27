@@ -417,6 +417,9 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         //     Verbose("  toolType IM1 not found :'(\n", toolType);
         // }
 
+        short iconWidth = diskObject->do_Gadget.Width;
+        short iconHeigth = diskObject->do_Gadget.Height;
+
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
         {
@@ -432,7 +435,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         {
             if (CenterX)
             {
-                newx = Align(origx, PaddingLeft, AlignX, diskObject->do_Gadget.Width / 2);
+                newx = Align(origx, PaddingLeft, AlignX, iconWidth / 2);
             }
             else
             {
@@ -453,7 +456,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         {
             if (BottomY)
             {
-                newy = Align(origy, PaddingTop, AlignY, diskObject->do_Gadget.Height);
+                newy = Align(origy, PaddingTop, AlignY, iconHeight);
             }
             else
             {
