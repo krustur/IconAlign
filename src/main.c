@@ -6,6 +6,7 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/icon.h>
+#include <workbench/icon.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -371,7 +372,18 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         fixedDiskObjectName[diskObjectNameLen - 5] = 0;
     }
 
-    struct DiskObject *diskObject = GetDiskObject(fixedDiskObjectName);
+    struct DiskObject *diskObject;
+
+    if (iconLibraryV44Enabled)
+    {
+        Verbose("GetDiscObjectBy: GetIconTags()\n");
+        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE);//ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
+    }
+    else
+    {
+        Verbose("GetDiscObjectBy: GetDiskObject()\n");
+        diskObject = GetDiskObject(fixedDiskObjectName);
+    }
     if (diskObject)
     {
         Verbose("Icon found: %s\n", fixedDiskObjectName);
