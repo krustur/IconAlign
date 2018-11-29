@@ -456,7 +456,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         {
             if (BottomY)
             {
-                newy = Align(origy, PaddingTop, AlignY, iconHeight);
+                newy = Align(origy, PaddingTop, AlignY, iconHeigth);
             }
             else
             {
