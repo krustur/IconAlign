@@ -374,19 +374,24 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
 
     struct DiskObject *diskObject;
 
+    long iconWidth = 0;
+    long iconHeigth = 0;
     if (iconLibraryV44Enabled)
     {
-        Verbose("GetDiscObjectBy: GetIconTags()\n");
-        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE);//ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
+        Verbose("Icon found (>=V44): %s\n", fixedDiskObjectName);
+        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE);//ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);        
+        IconControl(diskObject, ICONCTRLA_GetWidth, &iconWidth, TAG_DONE);
+        IconControl(diskObject, ICONCTRLA_GetHeight, &iconHeigth, TAG_DONE);
     }
     else
     {
-        Verbose("GetDiscObjectBy: GetDiskObject()\n");
+        Verbose("Icon found (<V44): %s\n", fixedDiskObjectName);
         diskObject = GetDiskObject(fixedDiskObjectName);
+        iconWidth = diskObject->do_Gadget.Width;
+        iconHeigth = diskObject->do_Gadget.Height;
     }
     if (diskObject)
     {
-        Verbose("Icon found: %s\n", fixedDiskObjectName);
         // Verbose("do_Magic: %x\n", diskObject->do_Magic);
         // Verbose(" Version: %hi\n", diskObject->do_Version);
         // Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
@@ -429,8 +434,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         //     Verbose("  toolType IM1 not found :'(\n", toolType);
         // }
 
-        short iconWidth = diskObject->do_Gadget.Width;
-        short iconHeigth = diskObject->do_Gadget.Height;
+      
 
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
