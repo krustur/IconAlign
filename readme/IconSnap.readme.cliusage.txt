@@ -1,0 +1,31 @@
+IconSnap    FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,
+            CENTERX/S,BOTTOMY/S,VERBOSE/S
+
+FILE/K:     Single File or Folder to Snap. Can point to either the
+            actual file/folder or it's associated .info file.
+
+DIR/K:      Folder containing Files and Folders to Snap. If you 
+            want to snap the actual folder, use the FILE parameter
+            instead.
+
+PADLEFT/N:  Use this option to create some Padding to the left of
+            the Snapped Icons.
+
+PADTOP/N:   Use this option to create some Padding above the Snapped
+            Icons.
+
+ALIGNX/N:   Number of pixels in the virual grid on the X axis.
+
+ALIGNY/N:   Number of pixels in the virual grid on the Y axis.
+
+CENTERX/S:  Snap horizontally to center of the Icon.
+            NOTE: A bug in the code, that reads the Icon width and 
+            heigth incorrectly, results in this feature not behaving
+            as expected!
+
+BOTTOMY/S:  Snap vertically to the bottom of the Icon. 
+            NOTE: A bug in the code, that reads the Icon width and 
+            heigth incorrectly, results in this feature not behaving
+            as expected!
+
+VERBOSE/S:  Active verbose logging. Used for debugging purposes.

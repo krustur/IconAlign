@@ -1,0 +1,3 @@
+Order your Icons in Workbench roughly the way you want them positioned, and
+then snapshot their position. After that run this tool and point it to the
+folder containg the Icons to be Snapshot.

@@ -1,0 +1,7 @@
+IconSnap is a command line utility that snaps Workbench icons to a virtual
+grid.
+
+Have you ever felt limited by Workbench's ability to layout the icons? This
+util aids you in your struggles by allowing you to roughly position your
+icons in Workbench any way you want, and then run this util to snap your
+Icons to a given grid.

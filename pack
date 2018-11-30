@@ -5,4 +5,99 @@ IF EXISTS bin_<version>
 ENDIF
 makedir bin_<version>
 
+echo "Updating IconSnap.readme file" 
+
+echo >  IconSnap.readme "Short:        Snap Workbench icons to a virtual grid"
+echo >> IconSnap.readme "Uploader:     krustur@google.com (Krister Jansson)"
+echo >> IconSnap.readme "Author:       Krister Jansson"
+echo >> IconSnap.readme "Type:         util/wb"
+echo >> IconSnap.readme "Version:      <version>"
+echo >> IconSnap.readme "Architecture: m68k-amigaos >= 2.0.4"
+echo >> IconSnap.readme "Distribution: Aminet"
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "About IconSnap:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.about.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Features:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.features.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Installation:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.installation.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "How to use:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.howtouse.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Command line usage:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.cliusage.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Examples:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.examples.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Version history:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.versions.txt
+echo >> IconSnap.readme ""
+
+echo >> IconSnap.readme "Bug reports and feature requests:"
+echo >> IconSnap.readme ""
+type >> IconSnap.readme readme/IconSnap.readme.bugs.txt
+echo >> IconSnap.readme ""
+
+echo "Updating README.md" 
+
+echo >  README.md "# IconSnap"
+echo >> README.md "## About"
+type >> README.md readme/IconSnap.readme.about.txt
+echo >> README.md ""
+
+echo >> README.md "#### Features"
+type >> README.md readme/IconSnap.readme.features.txt
+echo >> README.md ""
+
+echo >> README.md "## Installation"
+type >> README.md readme/IconSnap.readme.installation.txt
+echo >> README.md ""
+
+echo >> README.md "## How to use"
+type >> README.md readme/IconSnap.readme.howtouse.txt
+echo >> README.md ""
+
+echo >> README.md "### Command line usage"
+type >> README.md readme/IconSnap.readme.ticks.txt
+type >> README.md readme/IconSnap.readme.cliusage.txt
+type >> README.md readme/IconSnap.readme.ticks.txt
+echo >> README.md ""
+
+echo >> README.md "### Examples"
+type >> README.md readme/IconSnap.readme.ticks.txt
+type >> README.md readme/IconSnap.readme.examples.txt
+type >> README.md readme/IconSnap.readme.ticks.txt
+echo >> README.md ""
+
+echo >> README.md "## Version history"
+type >> README.md readme/IconSnap.readme.versions.txt
+echo >> README.md ""
+
+echo >> README.md "## Bug reports and feature requests"
+type >> README.md readme/IconSnap.readme.bugs.txt
+echo >> README.md ""
+
+
+
 lha -a a bin_<version>/IconSnap.lha IconSnap.readme IconSnap
+
+echo "Make sure given version <version> matches IconSnap executable version"
+version IconSnap full

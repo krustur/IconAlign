@@ -1,0 +1,3 @@
+IconSnap FILE Sys:Disk.info
+IconSnap DIR Sys:Utilities/
+IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY 

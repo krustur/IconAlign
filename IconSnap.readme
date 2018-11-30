@@ -2,7 +2,7 @@ Short:        Snap Workbench icons to a virtual grid
 Uploader:     krustur@google.com (Krister Jansson)
 Author:       Krister Jansson
 Type:         util/wb
-Version:      0.2
+Version:      0.3
 Architecture: m68k-amigaos >= 2.0.4
 Distribution: Aminet
 
@@ -17,18 +17,20 @@ icons in Workbench any way you want, and then run this util to snap your
 Icons to a given grid.
 
 Features:
+
 - Snap Workbench icons to grid (x and y individually customizable)
 - Add Padding to left and top (individually customizable)
 - Snap single icon
 - Snap all icons in entire folder or current directory
-- Experimental feature: Snap vertically to bottom
-- Experimental feature: Snap horizontally to center
+- Supports OS3.5 Icons (requires icon.library v44)
+- Snap vertically to bottom
+- Snap horizontally to center
 
 Installation:
 
 Copy IconSnap to C:
 
-Usage:
+How to use:
 
 Order your Icons in Workbench roughly the way you want them positioned, and
 then snapshot their position. After that run this tool and point it to the
@@ -74,6 +76,13 @@ IconSnap FILE Sys:Disk.info
 IconSnap DIR Sys:Utilities/
 IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY 
 
-Bug reports and Feature requests:
+Version history:
+
+0.3 Support for OS3.5 Icons (requires icon.library v44)
+0.2 First working version/release
+
+Bug reports and feature requests:
+
 Post your Bug reports and Feature requests on github: 
 https://github.com/krustur/IconSnap/issues
+

@@ -1,0 +1,2 @@
+Post your Bug reports and Feature requests on github: 
+https://github.com/krustur/IconSnap/issues

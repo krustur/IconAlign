@@ -13,20 +13,15 @@ Icons to a given grid.
 - Add Padding to left and top (individually customizable)
 - Snap single icon
 - Snap all icons in entire folder or current directory
-- Experimental feature: Snap vertically to bottom
-- Experimental feature: Snap horizontally to center
-
-## Version
-```VER: IconSnap 0.2 (26.11.2018)```
-
-## Requirements
-AmigaOS 2.04
+- Supports OS3.5 Icons (requires icon.library v44)
+- Snap vertically to bottom
+- Snap horizontally to center
 
 ## Installation
 Copy IconSnap to C:
 
-## Usage
-Order your Icons in Workbench roughly the way you want them positioned, and 
+## How to use
+Order your Icons in Workbench roughly the way you want them positioned, and
 then snapshot their position. After that run this tool and point it to the
 folder containg the Icons to be Snapshot.
 
@@ -69,8 +64,14 @@ VERBOSE/S:  Active verbose logging. Used for debugging purposes.
 ```
 IconSnap FILE Sys:Disk.info
 IconSnap DIR Sys:Utilities/
-IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY
+IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY 
 ```
 
-## Bug reports and Feature requests
-Post your Bug reports and Feature requests [on github](https://github.com/krustur/IconSnap/issues)
+## Version history
+0.3 Support for OS3.5 Icons (requires icon.library v44)
+0.2 First working version/release
+
+## Bug reports and feature requests
+Post your Bug reports and Feature requests on github: 
+https://github.com/krustur/IconSnap/issues
+

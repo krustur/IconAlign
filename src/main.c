@@ -30,7 +30,7 @@
 extern size_t __stack_usage;
 
 // Version tag
-#define VERSTAG "\0$VER: IconSnap 0.2 (26.11.2018)"
+#define VERSTAG "\0$VER: IconSnap 0.3 (30.11.2018)"
 unsigned char versiontag[] = VERSTAG;
 
 // Build Platform

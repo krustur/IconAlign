@@ -1,0 +1,7 @@
+- Snap Workbench icons to grid (x and y individually customizable)
+- Add Padding to left and top (individually customizable)
+- Snap single icon
+- Snap all icons in entire folder or current directory
+- Supports OS3.5 Icons (requires icon.library v44)
+- Snap vertically to bottom
+- Snap horizontally to center
