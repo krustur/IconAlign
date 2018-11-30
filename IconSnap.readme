@@ -79,6 +79,7 @@ IconSnap DIR Sys:Tools PADLEFT 15 PADTOP 15 ALIGNX 5 ALIGNY 5 CENTERX BOTTOMY
 Version history:
 
 0.3 Support for OS3.5 Icons (requires icon.library v44)
+
 0.2 First working version/release
 
 Bug reports and feature requests:

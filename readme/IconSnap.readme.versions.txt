@@ -1,2 +1,3 @@
 0.3 Support for OS3.5 Icons (requires icon.library v44)
+
 0.2 First working version/release
