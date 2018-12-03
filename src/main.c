@@ -91,6 +91,11 @@ long AlignX = 16;
 long AlignY = 16;
 short CenterX = FALSE;
 short BottomY = FALSE;
+char AlignCurrentWorkingDirTempPath[PATH_MAX];
+unsigned char AlignDirFixedDirName[PATH_MAX];
+unsigned char AlignDirFullPath[PATH_MAX];
+unsigned char AlignIconFixedDiskObjectName[PATH_MAX];
+
 unsigned int AlignCurrentWorkingDir();
 unsigned int AlignDir(unsigned char *diskObjectName);
 unsigned int AlignIcon(unsigned char *diskObjectName);
@@ -322,14 +327,12 @@ void StringToLower(char *str, unsigned int strLen, unsigned int offset)
 unsigned int AlignCurrentWorkingDir()
 {
     unsigned int fixCount = 0;
-    char *currentWorkingDir = malloc(PATH_MAX);
     //printf("sizeof(cwd): %ld\n",sizeof(cwd));
-    if (getcwd(currentWorkingDir, PATH_MAX) != NULL)
+    if (getcwd(AlignCurrentWorkingDirTempPath, PATH_MAX) != NULL)
     {
-        Verbose("Using current working dir: %s\n", currentWorkingDir);
-        fixCount = AlignDir(currentWorkingDir);
+        Verbose("Using current working dir: %s\n", AlignCurrentWorkingDirTempPath);
+        fixCount = AlignDir(AlignCurrentWorkingDirTempPath);
     }
-    free(currentWorkingDir);
     return fixCount;
 }
 
@@ -341,20 +344,19 @@ unsigned int AlignDir(unsigned char *dirName)
         Information("path \"%s\" is too long - skipping!\n", dirName);
         return 0;
     }
-    unsigned char *fixedDirName = malloc(PATH_MAX);
-    strcpy(fixedDirName, dirName);
+    strcpy(AlignDirFixedDirName, dirName);
     if (!StringEndsWith(dirName, "/") && !StringEndsWith(dirName, ":"))
     {
         Verbose("Appending \"/\" to dir\n");
 
-        fixedDirName[dirNameLen] = '/';
-        fixedDirName[dirNameLen + 1] = 0;
+        AlignDirFixedDirName[dirNameLen] = '/';
+        AlignDirFixedDirName[dirNameLen + 1] = 0;
         dirNameLen += 1;
-        Verbose("Fixed dir \"%s\"\n", fixedDirName);
+        Verbose("Fixed dir \"%s\"\n", AlignDirFixedDirName);
     }
 
     unsigned int fixCount = 0;
-    DIR *dir = opendir(fixedDirName);
+    DIR *dir = opendir(AlignDirFixedDirName);
     struct dirent *direntry;
     if (dir)
     {
@@ -369,34 +371,31 @@ unsigned int AlignDir(unsigned char *dirName)
             }
             else
             {
-                unsigned char *fullPath = malloc(PATH_MAX);
-                strcpy(fullPath, fixedDirName);
-                strcat(fullPath, direntry->d_name);
-                StringToLower(fullPath, fullLen, fullLen - 4);
-                if (StringEndsWith(fullPath, ".info"))
+                strcpy(AlignDirFullPath, AlignDirFixedDirName);
+                strcat(AlignDirFullPath, direntry->d_name);
+                StringToLower(AlignDirFullPath, fullLen, fullLen - 4);
+                if (StringEndsWith(AlignDirFullPath, ".info"))
                 {
-                    // Verbose("fullPath: %s\n", fullPath);
-                    fixCount += AlignIcon(fullPath);
+                    // Verbose("AlignDirFullPath: %s\n", AlignDirFullPath);
+                    fixCount += AlignIcon(AlignDirFullPath);
                 }
-                free(fullPath);
             }
             //printf("%s\n", direntry->d_name);
         }
         closedir(dir);
     }
-    free(fixedDirName);
     return fixCount;
 }
+
 
 unsigned int AlignIcon(unsigned char *diskObjectName)
 {
     unsigned long diskObjectNameLen = strlen(diskObjectName);
-    unsigned char *fixedDiskObjectName = malloc(PATH_MAX);
-    strcpy(fixedDiskObjectName, diskObjectName);
-    StringToLower(fixedDiskObjectName, diskObjectNameLen, diskObjectNameLen - 4);
-    if (StringEndsWith(fixedDiskObjectName, ".info"))
+    strcpy(AlignIconFixedDiskObjectName, diskObjectName);
+    StringToLower(AlignIconFixedDiskObjectName, diskObjectNameLen, diskObjectNameLen - 4);
+    if (StringEndsWith(AlignIconFixedDiskObjectName, ".info"))
     {
-        fixedDiskObjectName[diskObjectNameLen - 5] = 0;
+        AlignIconFixedDiskObjectName[diskObjectNameLen - 5] = 0;
     }
 
     struct DiskObject *diskObject;
@@ -405,15 +404,15 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
     long iconHeigth = 0;
     if (iconLibraryV44Enabled)
     {
-        Verbose("Icon found (>=V44): %s\n", fixedDiskObjectName);
-        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE); //ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
+        Verbose("Icon found (>=V44): %s\n", AlignIconFixedDiskObjectName);
+        diskObject = GetIconTags(AlignIconFixedDiskObjectName, TAG_DONE); //ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetWidth, &iconWidth, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetHeight, &iconHeigth, TAG_DONE);
     }
     else
     {
-        Verbose("Icon found (<V44): %s\n", fixedDiskObjectName);
-        diskObject = GetDiskObject(fixedDiskObjectName);
+        Verbose("Icon found (<V44): %s\n", AlignIconFixedDiskObjectName);
+        diskObject = GetDiskObject(AlignIconFixedDiskObjectName);
         iconWidth = diskObject->do_Gadget.Width;
         iconHeigth = diskObject->do_Gadget.Height;
     }
@@ -464,8 +463,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
         {
-            Information("Skip \"%s\" - no icon position\n", fixedDiskObjectName);
-            free(fixedDiskObjectName);
+            Information("Skip \"%s\" - no icon position\n", AlignIconFixedDiskObjectName);
             return 1;
         }
 
@@ -515,24 +513,21 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         if (!xaligned && !yaligned)
         {
             Information("Already aligned \"%s\" (%i,%i)\n",
-                        fixedDiskObjectName,
+                        AlignIconFixedDiskObjectName,
                         origx, origy);
-            free(fixedDiskObjectName);
             return 1;
         }
 
-        PutDiskObject(fixedDiskObjectName, diskObject);
+        PutDiskObject(AlignIconFixedDiskObjectName, diskObject);
         FreeDiskObject(diskObject);
 
         Information("Aligend \"%s\" (%i,%i) to (%i,%i)\n",
-                    fixedDiskObjectName,
+                    AlignIconFixedDiskObjectName,
                     origx, origy,
                     newx, newy);
-        free(fixedDiskObjectName);
         return 1;
     }
-    Verbose("Skipped \"%s\" - icon not found\n", fixedDiskObjectName);
-    free(fixedDiskObjectName);
+    Verbose("Skipped \"%s\" - icon not found\n", AlignIconFixedDiskObjectName);
     return 0;
 }
 
