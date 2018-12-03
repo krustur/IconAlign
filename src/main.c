@@ -210,10 +210,10 @@ int main(int argc, char **argv)
     }
 
     // Allocate memory areas
-    AlignCurrentWorkingDirTempPath = malloc(PATH_MAX);
-    AlignDirFixedDirName = malloc(PATH_MAX);
-    AlignDirFullPath = malloc(PATH_MAX);
-    AlignIconFixedDiskObjectName = malloc(PATH_MAX);
+    AlignCurrentWorkingDirTempPath = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignDirFixedDirName = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignDirFullPath = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignIconFixedDiskObjectName = AllocVec(PATH_MAX, MEMF_ANY);
 
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
@@ -259,19 +259,19 @@ void CleanExit()
 {
     if (AlignCurrentWorkingDirTempPath != NULL)
     {
-        free(AlignCurrentWorkingDirTempPath);
+        FreeVec(AlignCurrentWorkingDirTempPath);
     }
     if (AlignDirFixedDirName != NULL)
     {
-        free(AlignDirFixedDirName);
+        FreeVec(AlignDirFixedDirName);
     }
     if (AlignDirFullPath != NULL)
     {
-        free(AlignDirFullPath);
+        FreeVec(AlignDirFullPath);
     }
     if (AlignIconFixedDiskObjectName != NULL)
     {
-        free(AlignIconFixedDiskObjectName);
+        FreeVec(AlignIconFixedDiskObjectName);
     }
     if (rdargs != NULL)
     {
