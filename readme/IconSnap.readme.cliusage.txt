@@ -19,13 +19,7 @@ ALIGNX/N:   Number of pixels in the virual grid on the X axis.
 ALIGNY/N:   Number of pixels in the virual grid on the Y axis.
 
 CENTERX/S:  Snap horizontally to center of the Icon.
-            NOTE: A bug in the code, that reads the Icon width and 
-            heigth incorrectly, results in this feature not behaving
-            as expected!
 
 BOTTOMY/S:  Snap vertically to the bottom of the Icon. 
-            NOTE: A bug in the code, that reads the Icon width and 
-            heigth incorrectly, results in this feature not behaving
-            as expected!
 
 VERBOSE/S:  Active verbose logging. Used for debugging purposes.
