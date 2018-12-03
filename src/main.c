@@ -16,10 +16,6 @@
 #include <sys/syslimits.h>
 #include <unistd.h>
 
-// TODO: Readme.md
-// TODO: Readme for Amiga
-// TODO: Pack
-// TODO: Upload to Aminet
 // TODO: Scripted tests!
 
 // C helpers
@@ -131,7 +127,10 @@ int main(int argc, char **argv)
     }
     Verbose("Build platform: %s\n", BuildPlatform);
     Verbose("dos.library version %li\n", DosBase->lib_Version);
+    Verbose("dos.library opencnt %li\n", DosBase->lib_OpenCnt);
     Verbose("icon.library version %li\n", IconBase->lib_Version);
+    Verbose("icon.library opencnt %li\n", IconBase->lib_OpenCnt);
+
     if (IconBase->lib_Version >= 45)
     {
         Verbose("Icon library V44 features enabled\n");
