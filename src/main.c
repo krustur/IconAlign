@@ -91,10 +91,10 @@ long AlignX = 16;
 long AlignY = 16;
 short CenterX = FALSE;
 short BottomY = FALSE;
-char AlignCurrentWorkingDirTempPath[PATH_MAX];
-unsigned char AlignDirFixedDirName[PATH_MAX];
-unsigned char AlignDirFullPath[PATH_MAX];
-unsigned char AlignIconFixedDiskObjectName[PATH_MAX];
+char *AlignCurrentWorkingDirTempPath = NULL;
+unsigned char *AlignDirFixedDirName = NULL;
+unsigned char *AlignDirFullPath = NULL;
+unsigned char *AlignIconFixedDiskObjectName = NULL;
 
 unsigned int AlignCurrentWorkingDir();
 unsigned int AlignDir(unsigned char *diskObjectName);
@@ -209,6 +209,12 @@ int main(int argc, char **argv)
         return RETURN_ERROR;
     }
 
+    // Allocate memory areas
+    AlignCurrentWorkingDirTempPath = malloc(PATH_MAX);
+    AlignDirFixedDirName = malloc(PATH_MAX);
+    AlignDirFullPath = malloc(PATH_MAX);
+    AlignIconFixedDiskObjectName = malloc(PATH_MAX);
+
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
     {
@@ -251,6 +257,22 @@ int main(int argc, char **argv)
 
 void CleanExit()
 {
+    if (AlignCurrentWorkingDirTempPath != NULL)
+    {
+        free(AlignCurrentWorkingDirTempPath);
+    }
+    if (AlignDirFixedDirName != NULL)
+    {
+        free(AlignDirFixedDirName);
+    }
+    if (AlignDirFullPath != NULL)
+    {
+        free(AlignDirFullPath);
+    }
+    if (AlignIconFixedDiskObjectName != NULL)
+    {
+        free(AlignIconFixedDiskObjectName);
+    }
     if (rdargs != NULL)
     {
         FreeArgs(rdargs);
@@ -391,6 +413,7 @@ unsigned int AlignDir(unsigned char *dirName)
 unsigned int AlignIcon(unsigned char *diskObjectName)
 {
     unsigned long diskObjectNameLen = strlen(diskObjectName);
+    // unsigned char *fixedDiskObjectName = malloc(PATH_MAX);
     strcpy(AlignIconFixedDiskObjectName, diskObjectName);
     StringToLower(AlignIconFixedDiskObjectName, diskObjectNameLen, diskObjectNameLen - 4);
     if (StringEndsWith(AlignIconFixedDiskObjectName, ".info"))
