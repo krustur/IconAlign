@@ -15,6 +15,7 @@
 #include <dirent.h>
 #include <sys/syslimits.h>
 #include <unistd.h>
+#include <signal.h>
 
 // TODO: Scripted tests!
 
@@ -68,6 +69,10 @@ long argArray[] =
         0,
         0};
 unsigned char argumentString[] = "FILE/K,DIR/K,PADLEFT/N,PADTOP/N,ALIGNX/N,ALIGNY/N,CENTERX/S,BOTTOMY/S,VERBOSE/S";
+struct RDArgs *rdargs = NULL;
+
+// clean exit handling
+void CleanExit();
 
 // Logging
 short verbose = FALSE;
@@ -93,6 +98,17 @@ long Align(long orig, long pad, long align, long alignoffset);
 
 int main(int argc, char **argv)
 {
+    atexit(CleanExit);
+
+    if (argc == 0)
+    {
+        //Opened from WB
+    }
+    else
+    {
+        // printf("fignal\n");
+        // signal(SIGINT, intHandler);
+    }
     // Open libraries
     DosBase = OpenLibrary("dos.library", DosVersion);
     if (!DosBase)
@@ -112,7 +128,7 @@ int main(int argc, char **argv)
 
     // check arguments
 
-    struct RDArgs *rdargs = ReadArgs(argumentString, argArray, NULL);
+    rdargs = ReadArgs(argumentString, argArray, NULL);
 
     if (!rdargs)
     {
@@ -223,16 +239,28 @@ int main(int argc, char **argv)
     //     return RETURN_ERROR;
     // }
 
-    if (rdargs)
-    {
-        FreeArgs(rdargs);
-    }
-    CloseLibrary(DosBase);
-    CloseLibrary(IconBase);
-
     Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
 
     return RETURN_OK;
+}
+
+void CleanExit()
+{
+    if (rdargs != NULL)
+    {
+        FreeArgs(rdargs);
+        rdargs = NULL;
+    }
+    if (DosBase != NULL)
+    {
+        CloseLibrary(DosBase);
+        DosBase = NULL;
+    }
+    if (IconBase != NULL)
+    {
+        CloseLibrary(IconBase);
+        IconBase = NULL;
+    }
 }
 
 // Logging
@@ -378,7 +406,7 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
     if (iconLibraryV44Enabled)
     {
         Verbose("Icon found (>=V44): %s\n", fixedDiskObjectName);
-        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE);//ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);        
+        diskObject = GetIconTags(fixedDiskObjectName, TAG_DONE); //ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetWidth, &iconWidth, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetHeight, &iconHeigth, TAG_DONE);
     }
@@ -432,8 +460,6 @@ unsigned int AlignIcon(unsigned char *diskObjectName)
         // {
         //     Verbose("  toolType IM1 not found :'(\n", toolType);
         // }
-
-      
 
         // diskObject->do_CurrentX += 10;
         if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)

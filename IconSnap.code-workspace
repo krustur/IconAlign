@@ -24,7 +24,8 @@
 			"exec_pragmas.h": "c",
 			"dirent.h": "c",
 			"unistd.h": "c",
-			"intuition.h": "c"
+			"intuition.h": "c",
+			"signal.h": "c"
 		}
 	}
 }
