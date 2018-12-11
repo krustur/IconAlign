@@ -17,34 +17,17 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include "sys.h"
+
 // TODO: Scripted tests!
 
 // C helpers
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-// VBCC
-extern size_t __stack_usage;
-
 // Version tag
 #define VERSTAG "\0$VER: IconSnap 0.3 (30.11.2018)"
 unsigned char versiontag[] = VERSTAG;
-
-// Build Platform
-#ifdef BUILD_PLATFORM_AMIGA
-const char *BuildPlatform = "Amiga";
-#elif BUILD_PLATFORM_WIN
-const char *BuildPlatform = "Win";
-#else
-const char *BuildPlatform = "Unknown";
-#endif
-
-// Libraries
-unsigned long DosVersion = 37L;
-struct Library *DosBase = NULL;
-unsigned long IconVersion = 37L;
-struct Library *IconBase = NULL;
-short iconLibraryV44Enabled = FALSE;
 
 // Arguments
 unsigned char FILE_OPTION_POS = 0;
@@ -74,11 +57,6 @@ struct RDArgs *rdargs = NULL;
 // clean exit handling
 void CleanExit();
 
-// Logging
-short verbose = FALSE;
-void Information(const char *fmt, ...);
-void Verbose(const char *fmt, ...);
-
 // String/Path handling
 size_t maxPathTreshold = PATH_MAX - 2;
 short StringEndsWith(const char *str, const char *suffix);
@@ -104,35 +82,25 @@ long Align(long orig, long pad, long align, long alignoffset);
 int main(int argc, char **argv)
 {
     atexit(CleanExit);
+   
+    short sysInitResult = SysInit(argc, argv);
+    if (sysInitResult != RETURN_OK)
+    {
+        exit(sysInitResult);
+    }
 
     if (argc == 0)
     {
         //Opened from WB
+        Information("Started from Workbench\n");
+        exit(RETURN_OK);
     }
     else
     {
-        // printf("fignal\n");
-        // signal(SIGINT, intHandler);
+        Verbose("Started from CLI\n");
     }
-    // Open libraries
-    DosBase = OpenLibrary("dos.library", DosVersion);
-    if (!DosBase)
-    {
-        Information("Failed to open dos.library %li\n", DosVersion);
-        return RETURN_ERROR;
-    }
-    // Verbose("DosBase: %p\n", (void *)DosBase);
-
-    IconBase = OpenLibrary("icon.library", IconVersion);
-    if (!IconBase)
-    {
-        Information("Failed to open icon.library %li\n", IconVersion);
-        return RETURN_ERROR;
-    }
-    // Verbose("IconBase: %p\n", (void *)IconBase);
 
     // check arguments
-
     rdargs = ReadArgs(argumentString, argArray, NULL);
 
     if (!rdargs)
@@ -141,21 +109,10 @@ int main(int argc, char **argv)
         return RETURN_ERROR;
     }
 
-    verbose = argArray[VERBOSE_OPTION_POS] == DOSTRUE;
-    if (verbose)
+    short verbose2 = argArray[VERBOSE_OPTION_POS] == DOSTRUE;
+    if (verbose2)
     {
-        Verbose(" VERBOSE logging active\n");
-    }
-    Verbose("Build platform: %s\n", BuildPlatform);
-    Verbose("dos.library version %li\n", DosBase->lib_Version);
-    Verbose("dos.library opencnt %li\n", DosBase->lib_OpenCnt);
-    Verbose("icon.library version %li\n", IconBase->lib_Version);
-    Verbose("icon.library opencnt %li\n", IconBase->lib_OpenCnt);
-
-    if (IconBase->lib_Version >= 45)
-    {
-        Verbose("Icon library V44 features enabled\n");
-        iconLibraryV44Enabled = TRUE;
+        SysSetVerboseEnabled(TRUE);
     }
 
     unsigned char *fileOption = (unsigned char *)argArray[FILE_OPTION_POS];
@@ -250,8 +207,6 @@ int main(int argc, char **argv)
     //     return RETURN_ERROR;
     // }
 
-    Verbose("Stack used: %lu\n", (unsigned long)__stack_usage);
-
     return RETURN_OK;
 }
 
@@ -278,36 +233,7 @@ void CleanExit()
         FreeArgs(rdargs);
         rdargs = NULL;
     }
-    if (DosBase != NULL)
-    {
-        CloseLibrary(DosBase);
-        DosBase = NULL;
-    }
-    if (IconBase != NULL)
-    {
-        CloseLibrary(IconBase);
-        IconBase = NULL;
-    }
-}
-
-// Logging
-void Verbose(const char *fmt, ...)
-{
-    if (!verbose)
-        return;
-
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stdout, fmt, args);
-    va_end(args);
-}
-
-void Information(const char *fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stdout, fmt, args);
-    va_end(args);
+    SysCleanup();
 }
 
 // String/Path handling
@@ -408,7 +334,6 @@ unsigned int AlignDir(unsigned char *dirName)
     }
     return fixCount;
 }
-
 
 unsigned int AlignIcon(unsigned char *diskObjectName)
 {
