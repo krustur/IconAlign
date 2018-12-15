@@ -34,6 +34,9 @@ short iconLibraryV44Enabled = FALSE;
 
 // Logging
 #define LOG_MAX (256)
+// const char *ConsoleString = "CON:20/20/500/100/IconSnap/CLOSE";
+const char *ConsoleString = "CON:20/20/500/100/IconSnap";
+long ConsoleDelay = 100;
 unsigned char *LogBuffer = NULL;
 short verbose = FALSE;
 BPTR wbcon = (BPTR)NULL;
@@ -70,7 +73,7 @@ short SysInit(int argc, char **argv)
     if (argc == 0)
     {
         //Opened from WB
-        wbcon = Open("CON:20/20/500/100/IconSnap", MODE_NEWFILE);
+        wbcon = Open(ConsoleString, MODE_NEWFILE);
         SelectOutput(wbcon);
     }
 
@@ -87,7 +90,7 @@ void SysCleanup(void)
     }
     if (wbcon != (BPTR)NULL)
     {
-        Delay(100);
+        Delay(ConsoleDelay);
         Close(wbcon);
     }
     if (DosBase != NULL)
@@ -117,6 +120,12 @@ void SysSetVerboseEnabled(short enabled)
     }
 }
 
+void SysSetConsoleDelay(long delay)
+{
+    Verbose("ConsoleDelay changed from %li to %li\n", ConsoleDelay, delay);
+    ConsoleDelay = delay;
+}
+
 // Logging
 void Verbose(const char *fmt, ...)
 {
@@ -124,9 +133,15 @@ void Verbose(const char *fmt, ...)
         return;
 
     va_list args;
-    // va_start(args, fmt);
-    Information(fmt, args);
-    // va_end(args);
+    va_start(args, fmt);
+    vsnprintf(LogBuffer, LOG_MAX-1, fmt, args);
+    Write(Output(), LogBuffer, strlen(LogBuffer));
+    va_end(args);
+
+    // va_list args;
+    // // va_start(args, fmt);
+    // Information(fmt, args);
+    // // va_end(args);
 }
 
 void Information(const char *fmt, ...)

@@ -26,7 +26,8 @@
 			"unistd.h": "c",
 			"intuition.h": "c",
 			"signal.h": "c",
-			"exec_sysbase_pragmas.h": "c"
+			"exec_sysbase_pragmas.h": "c",
+			"execbase.h": "c"
 		}
 	}
 }

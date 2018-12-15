@@ -10,5 +10,6 @@ void SysSetVerboseEnabled(short enabled);
 // Logging
 void Information(const char *fmt, ...);
 void Verbose(const char *fmt, ...);
+void SysSetConsoleDelay(long delay);
 
 #endif	/* SYS_H */
