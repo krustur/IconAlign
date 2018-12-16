@@ -93,6 +93,12 @@ int main(int argc, char **argv)
         exit(sysInitResult);
     }
 
+    // Allocate memory areas
+    AlignCurrentWorkingDirTempPath = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignDirFixedDirName = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignDirFullPath = AllocVec(PATH_MAX, MEMF_ANY);
+    AlignIconFixedDiskObjectName = AllocVec(PATH_MAX, MEMF_ANY);
+
     if (argc == 0)
     {
         // Opened from WB
@@ -164,43 +170,43 @@ int main(int argc, char **argv)
             Verbose(" BOTTOMY %hi\n", BottomY);
         }
 
+        LONG wbNumArgs = wbStartup->sm_NumArgs;
+        Verbose("Number of Workbench arguments received = %ld\n", wbNumArgs);
+
         // No tools selected?
-        if (argc <= 1)
+        if (wbNumArgs <= 1)
         {
             Information("Use IconSnap from Workbench by Shift-clicking on the Icons\n");
             Information("you want to SnapShot, and double click on IconSnap\n");
             exit(RETURN_OK);
         }
 
-
         // Iterate parameters
-        LONG numArgs = wbStartup->sm_NumArgs;
-        Verbose("Number of arguments received = %ld\n", numArgs);
+        for (LONG i = 1; i < wbNumArgs; i++)
+        {
+            //Verbose("Argument %ld name =  %s\n", i, wbStartup->sm_ArgList[i].wa_Name);
+            if (wbStartup->sm_ArgList[i].wa_Lock != ZERO)
+            {
+                BPTR oldDir = CurrentDir(wbStartup->sm_ArgList[i].wa_Lock);
 
-        // for (LONG i = 0; i < numArgs; i++)
-        // {
-        //Verbose("Argument %ld name =  %s\n", i, wbStartup->sm_ArgList[i].wa_Name);
-        // if (wbStartup->sm_ArgList[0].wa_Lock != ZERO)
-        // {
-        //     BPTR oldDir = CurrentDir(wbStartup->sm_ArgList[0].wa_Lock);
-
-        //     struct DiskObject *dobj;
-        //     dobj = GetDiskObjectNew(wbStartup->sm_ArgList[i].wa_Name);
-        //     if (dobj != NULL)
-        //     {
-        //         Information("Opened disk object.\n");
-        //         STRPTR TTarg = NULL;
-        //         TTarg = FindToolType(dobj->do_ToolTypes, "TEST");
-        //         if (TTarg)
-        //         {
-        //             Verbose("              TEST found set to = >%s<\n", TTarg);
-        //         }
-        //     }
-        //     CurrentDir(oldDir);
-        // }
-        // Verbose("");
-
-        // }
+                Verbose("AlignFile %s\n", wbStartup->sm_ArgList[i].wa_Name);
+                AlignFile(wbStartup->sm_ArgList[i].wa_Name);
+                //     struct DiskObject *dobj;
+                //     dobj = GetDiskObjectNew(wbStartup->sm_ArgList[i].wa_Name);
+                //     if (dobj != NULL)
+                //     {
+                //         Information("Opened disk object.\n");
+                //         STRPTR TTarg = NULL;
+                //         TTarg = FindToolType(dobj->do_ToolTypes, "TEST");
+                //         if (TTarg)
+                //         {
+                //             Verbose("              TEST found set to = >%s<\n", TTarg);
+                //         }
+                //     }
+                CurrentDir(oldDir);
+            }
+            // Verbose("");
+        }
 
         exit(RETURN_OK);
     }
@@ -270,12 +276,6 @@ int main(int argc, char **argv)
         Information("Can't align to 0\n");
         return RETURN_ERROR;
     }
-
-    // Allocate memory areas
-    AlignCurrentWorkingDirTempPath = AllocVec(PATH_MAX, MEMF_ANY);
-    AlignDirFixedDirName = AllocVec(PATH_MAX, MEMF_ANY);
-    AlignDirFullPath = AllocVec(PATH_MAX, MEMF_ANY);
-    AlignIconFixedDiskObjectName = AllocVec(PATH_MAX, MEMF_ANY);
 
     unsigned int fixCount = 0;
     if (!fileOption && !dirOption)
@@ -457,21 +457,135 @@ unsigned int AlignFile(unsigned char *diskObjectName)
     long iconHeigth = 0;
     if (iconLibraryV44Enabled)
     {
-        Verbose("Icon found (>=V44): %s\n", AlignIconFixedDiskObjectName);
         diskObject = GetIconTags(AlignIconFixedDiskObjectName, TAG_DONE); //ICONGETA_GetPaletteMappedIcon, FALSE, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetWidth, &iconWidth, TAG_DONE);
         IconControl(diskObject, ICONCTRLA_GetHeight, &iconHeigth, TAG_DONE);
     }
     else
     {
-        Verbose("Icon found (<V44): %s\n", AlignIconFixedDiskObjectName);
         diskObject = GetDiskObject(AlignIconFixedDiskObjectName);
         iconWidth = diskObject->do_Gadget.Width;
         iconHeigth = diskObject->do_Gadget.Height;
     }
     if (diskObject)
     {
-        return AlignDiskObject(diskObject, iconWidth, iconHeigth);
+        if (iconLibraryV44Enabled)
+        {
+            Verbose("Icon found (>=V44): %s\n", AlignIconFixedDiskObjectName);
+        }
+        else
+        {
+            Verbose("Icon found (<V44): %s\n", AlignIconFixedDiskObjectName);
+        }
+
+        // Verbose("do_Magic: %x\n", diskObject->do_Magic);
+        // Verbose(" Version: %hi\n", diskObject->do_Version);
+        // Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
+        // Verbose(" do_DefaultTool: %s\n", diskObject->do_DefaultTool);
+        // Verbose("do_DefaultTool: ");
+        // Verbose(diskObject->do_DefaultTool);
+        // Verbose("\n");
+        Verbose(" do_CurrentX: %li\n", diskObject->do_CurrentX);
+        Verbose(" do_CurrentY: %li\n", diskObject->do_CurrentY);
+        // Verbose(" Width: %hi\n", diskObject->);
+        // Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
+        // Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
+        Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
+        Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
+        // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
+        // Verbose(" SelectRender: %p\n", diskObject->do_Gadget.SelectRender);
+        // struct Image *gadgetImage = (struct Image *)(diskObject->do_Gadget.GadgetRender);
+        // Verbose(" gadgetImage Width: %hi\n", gadgetImage->Width);
+        // Verbose(" gadgetImage Height: %hi\n", gadgetImage->Height);
+
+        // struct Image *selectImage = (struct Image *)(diskObject->do_Gadget.SelectRender);
+        // if (selectImage)
+        // {
+        //     Verbose(" selectImage Width: %hi\n", selectImage->Width);
+        //     Verbose(" selectImage Height: %hi\n", selectImage->Height);
+        // }
+        // Verbose(" Flags: %hi\n", diskObject->U);
+        // Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
+        // Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
+        // Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
+        // Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
+        // unsigned char *toolType = NULL;
+        // toolType = FindToolType(diskObject->do_ToolTypes, "IM1");
+        // if (toolType)
+        // {
+        //     Verbose("  toolType IM1 = \"%s\"\n", toolType);
+        // }
+        // else
+        // {
+        //     Verbose("  toolType IM1 not found :'(\n", toolType);
+        // }
+
+        // diskObject->do_CurrentX += 10;
+        if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
+        {
+            Information("Skip \"%s\" - no icon position\n", AlignIconFixedDiskObjectName);
+            return 1;
+        }
+
+        short xaligned = FALSE;
+        long origx = diskObject->do_CurrentX;
+        long newx;
+        if (diskObject->do_CurrentX != NO_ICON_POSITION)
+        {
+            if (CenterX)
+            {
+                newx = Align(origx, PaddingLeft, AlignX, iconWidth / 2);
+            }
+            else
+            {
+                newx = Align(origx, PaddingLeft, AlignX, 0);
+            }
+            // long currx = (origx - PaddingLeft) + (AlignX / 2);
+            // newx = PaddingLeft + currx - (currx % AlignX);
+            if (newx != origx)
+            {
+                xaligned = TRUE;
+            }
+            diskObject->do_CurrentX = newx;
+        }
+        short yaligned = FALSE;
+        long origy = diskObject->do_CurrentY;
+        long newy;
+        if (diskObject->do_CurrentY != NO_ICON_POSITION)
+        {
+            if (BottomY)
+            {
+                newy = Align(origy, PaddingTop, AlignY, iconHeigth);
+            }
+            else
+            {
+                newy = Align(origy, PaddingTop, AlignY, 0);
+            }
+            // long curry = (origy - PaddingTop) + (AlignY / 2);
+            // newy = PaddingTop + curry - (curry % AlignY);
+            if (newy != origy)
+            {
+                yaligned = TRUE;
+                diskObject->do_CurrentY = newy;
+            }
+        }
+
+        if (!xaligned && !yaligned)
+        {
+            Information("Already aligned \"%s\" (%i,%i)\n",
+                        AlignIconFixedDiskObjectName,
+                        origx, origy);
+            return 1;
+        }
+
+        PutDiskObject(AlignIconFixedDiskObjectName, diskObject);
+        FreeDiskObject(diskObject);
+
+        Information("Aligend \"%s\" (%i,%i) to (%i,%i)\n",
+                    AlignIconFixedDiskObjectName,
+                    origx, origy,
+                    newx, newy);
+        return 1;
     }
     Verbose("Skipped \"%s\" - icon not found\n", AlignIconFixedDiskObjectName);
     return 0;
@@ -479,114 +593,6 @@ unsigned int AlignFile(unsigned char *diskObjectName)
 
 unsigned int AlignDiskObject(struct DiskObject *diskObject, long iconWidth, long iconHeigth)
 {
-    // Verbose("do_Magic: %x\n", diskObject->do_Magic);
-    // Verbose(" Version: %hi\n", diskObject->do_Version);
-    // Verbose(" do_Type: %i\n", (int)diskObject->do_Type);
-    // Verbose(" do_DefaultTool: %s\n", diskObject->do_DefaultTool);
-    // Verbose("do_DefaultTool: ");
-    // Verbose(diskObject->do_DefaultTool);
-    // Verbose("\n");
-    Verbose(" do_CurrentX: %li\n", diskObject->do_CurrentX);
-    Verbose(" do_CurrentY: %li\n", diskObject->do_CurrentY);
-    // Verbose(" Width: %hi\n", diskObject->);
-    // Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
-    // Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
-    Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
-    Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
-    // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
-    // Verbose(" SelectRender: %p\n", diskObject->do_Gadget.SelectRender);
-    // struct Image *gadgetImage = (struct Image *)(diskObject->do_Gadget.GadgetRender);
-    // Verbose(" gadgetImage Width: %hi\n", gadgetImage->Width);
-    // Verbose(" gadgetImage Height: %hi\n", gadgetImage->Height);
-
-    // struct Image *selectImage = (struct Image *)(diskObject->do_Gadget.SelectRender);
-    // if (selectImage)
-    // {
-    //     Verbose(" selectImage Width: %hi\n", selectImage->Width);
-    //     Verbose(" selectImage Height: %hi\n", selectImage->Height);
-    // }
-    // Verbose(" Flags: %hi\n", diskObject->U);
-    // Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
-    // Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
-    // Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
-    // Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
-    // unsigned char *toolType = NULL;
-    // toolType = FindToolType(diskObject->do_ToolTypes, "IM1");
-    // if (toolType)
-    // {
-    //     Verbose("  toolType IM1 = \"%s\"\n", toolType);
-    // }
-    // else
-    // {
-    //     Verbose("  toolType IM1 not found :'(\n", toolType);
-    // }
-
-    // diskObject->do_CurrentX += 10;
-    if (diskObject->do_CurrentX == NO_ICON_POSITION && diskObject->do_CurrentX == NO_ICON_POSITION)
-    {
-        Information("Skip \"%s\" - no icon position\n", AlignIconFixedDiskObjectName);
-        return 1;
-    }
-
-    short xaligned = FALSE;
-    long origx = diskObject->do_CurrentX;
-    long newx;
-    if (diskObject->do_CurrentX != NO_ICON_POSITION)
-    {
-        if (CenterX)
-        {
-            newx = Align(origx, PaddingLeft, AlignX, iconWidth / 2);
-        }
-        else
-        {
-            newx = Align(origx, PaddingLeft, AlignX, 0);
-        }
-        // long currx = (origx - PaddingLeft) + (AlignX / 2);
-        // newx = PaddingLeft + currx - (currx % AlignX);
-        if (newx != origx)
-        {
-            xaligned = TRUE;
-        }
-        diskObject->do_CurrentX = newx;
-    }
-    short yaligned = FALSE;
-    long origy = diskObject->do_CurrentY;
-    long newy;
-    if (diskObject->do_CurrentY != NO_ICON_POSITION)
-    {
-        if (BottomY)
-        {
-            newy = Align(origy, PaddingTop, AlignY, iconHeigth);
-        }
-        else
-        {
-            newy = Align(origy, PaddingTop, AlignY, 0);
-        }
-        // long curry = (origy - PaddingTop) + (AlignY / 2);
-        // newy = PaddingTop + curry - (curry % AlignY);
-        if (newy != origy)
-        {
-            yaligned = TRUE;
-            diskObject->do_CurrentY = newy;
-        }
-    }
-
-    if (!xaligned && !yaligned)
-    {
-        Information("Already aligned \"%s\" (%i,%i)\n",
-                    AlignIconFixedDiskObjectName,
-                    origx, origy);
-        return 1;
-    }
-
-    PutDiskObject(AlignIconFixedDiskObjectName, diskObject);
-    FreeDiskObject(diskObject);
-
-    Information("Aligend \"%s\" (%i,%i) to (%i,%i)\n",
-                AlignIconFixedDiskObjectName,
-                origx, origy,
-                newx, newy);
-    return 1;
 }
 
 long Align(long orig, long pad, long align, long alignoffset)
