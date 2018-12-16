@@ -60,6 +60,10 @@ struct RDArgs *rdargs = NULL;
 // clean exit handling
 void CleanExit();
 
+// Workbench logic
+char *MainParamFolder = NULL;
+char *MainParamFolderFixed = NULL;
+
 // String/Path handling
 size_t maxPathTreshold = PATH_MAX - 2;
 short StringEndsWith(const char *str, const char *suffix);
@@ -94,6 +98,8 @@ int main(int argc, char **argv)
     }
 
     // Allocate memory areas
+    MainParamFolder = AllocVec(PATH_MAX, MEMF_ANY);
+    MainParamFolderFixed = AllocVec(PATH_MAX, MEMF_ANY);
     AlignCurrentWorkingDirTempPath = AllocVec(PATH_MAX, MEMF_ANY);
     AlignDirFixedDirName = AllocVec(PATH_MAX, MEMF_ANY);
     AlignDirFullPath = AllocVec(PATH_MAX, MEMF_ANY);
@@ -176,12 +182,14 @@ int main(int argc, char **argv)
         // No tools selected?
         if (wbNumArgs <= 1)
         {
-            Information("Use IconSnap from Workbench by Shift-clicking on the Icons\n");
-            Information("you want to SnapShot, and double click on IconSnap\n");
+            Information("Use IconSnap from Workbench by Selecting the IconSnap\n");
+            Information("and then Shift-selecting the Icons you want to SnapShot\n");
+            Information("and finally double click\n");
             exit(RETURN_OK);
         }
 
         // Iterate parameters
+        unsigned int wbFixCount = 0;
         for (LONG i = 1; i < wbNumArgs; i++)
         {
             //Verbose("Argument %ld name =  %s\n", i, wbStartup->sm_ArgList[i].wa_Name);
@@ -189,8 +197,47 @@ int main(int argc, char **argv)
             {
                 BPTR oldDir = CurrentDir(wbStartup->sm_ArgList[i].wa_Lock);
 
-                Verbose("AlignFile %s\n", wbStartup->sm_ArgList[i].wa_Name);
-                AlignFile(wbStartup->sm_ArgList[i].wa_Name);
+                if (wbStartup->sm_ArgList[i].wa_Name[0] != 0)
+                {
+                    wbFixCount = AlignFile(wbStartup->sm_ArgList[i].wa_Name);
+                }
+                else
+                {
+                    NameFromLock(wbStartup->sm_ArgList[i].wa_Lock, MainParamFolder, PATH_MAX - 2);
+                    if (StringEndsWith(MainParamFolder, ":"))
+                    {
+
+                        // size_t t = strlen("kurt");
+                        // Information("t: %li\n", t);
+
+                        // size_t mainParamFolderLen = strlen(MainParamFolder);
+                        size_t mainParamFolderLen = strlen(MainParamFolder);
+                        size_t fullLen = mainParamFolderLen + 4;
+                        if (fullLen > PATH_MAX - 2)
+                        {
+                            Information("full path to %s is too long - skipping!\n", MainParamFolder);
+                        }
+                        else
+                        {
+
+                            strcpy(MainParamFolderFixed, MainParamFolder);
+                            strcat(MainParamFolderFixed, "disk");
+                            //     StringToLower(AlignDirFullPath, fullLen, fullLen - 4);
+                            //     if (StringEndsWith(AlignDirFullPath, ".info"))
+                            //     {
+                            //         // Verbose("AlignDirFullPath: %s\n", AlignDirFullPath);
+                            wbFixCount += AlignFile(MainParamFolderFixed);
+                            //     }
+                        }
+                    }
+                    else
+                    {
+                        wbFixCount += AlignFile(MainParamFolder);
+                    }
+                    // AlignFile("dh0:disk");
+                }
+                // Verbose("Folder %s\n", MainParamFolder);
+                // Verbose("AlignFile %s\n", wbStartup->sm_ArgList[i].wa_Name);
                 //     struct DiskObject *dobj;
                 //     dobj = GetDiskObjectNew(wbStartup->sm_ArgList[i].wa_Name);
                 //     if (dobj != NULL)
@@ -207,7 +254,10 @@ int main(int argc, char **argv)
             }
             // Verbose("");
         }
-
+        if (wbFixCount == 0)
+        {
+            Information("No icons found\n");
+        }
         exit(RETURN_OK);
     }
 
@@ -317,6 +367,14 @@ int main(int argc, char **argv)
 
 void CleanExit()
 {
+    if (MainParamFolder != NULL)
+    {
+        FreeVec(MainParamFolder);
+    }
+    if (MainParamFolderFixed != NULL)
+    {
+        FreeVec(MainParamFolderFixed);
+    }
     if (AlignCurrentWorkingDirTempPath != NULL)
     {
         FreeVec(AlignCurrentWorkingDirTempPath);
@@ -490,8 +548,8 @@ unsigned int AlignFile(unsigned char *diskObjectName)
         // Verbose(" Width: %hi\n", diskObject->);
         // Verbose(" SpecialInfo: %p\n", diskObject->do_Gadget.SpecialInfo);
         // Verbose(" UserData: %p\n", diskObject->do_Gadget.UserData);
-        Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
-        Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
+        // Verbose(" Width: %hi\n", diskObject->do_Gadget.Width);
+        // Verbose(" Height: %hi\n", diskObject->do_Gadget.Height);
         // Verbose(" GadgetRender: %p\n", diskObject->do_Gadget.GadgetRender);
         // Verbose(" SelectRender: %p\n", diskObject->do_Gadget.SelectRender);
         // struct Image *gadgetImage = (struct Image *)(diskObject->do_Gadget.GadgetRender);
@@ -507,8 +565,8 @@ unsigned int AlignFile(unsigned char *diskObjectName)
         // Verbose(" Flags: %hi\n", diskObject->U);
         // Verbose(" Flags: %hi\n", diskObject->do_Gadget.Flags);
         // Verbose(" GadgetType: %hi\n", diskObject->do_Gadget.GadgetType);
-        // Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
-        // Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
+        //Verbose(" LeftEdge: %hi\n", diskObject->do_Gadget.LeftEdge);
+        //Verbose(" TopEdge: %hi\n", diskObject->do_Gadget.TopEdge);
         // unsigned char *toolType = NULL;
         // toolType = FindToolType(diskObject->do_ToolTypes, "IM1");
         // if (toolType)
