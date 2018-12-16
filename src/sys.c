@@ -35,7 +35,7 @@ short iconLibraryV44Enabled = FALSE;
 // Logging
 #define LOG_MAX (256)
 // const char *ConsoleString = "CON:20/20/500/100/IconSnap/CLOSE";
-const char *ConsoleString = "CON:20/20/500/100/IconSnap";
+const char *ConsoleString = "CON:15/23/500/220/IconSnap";
 long ConsoleDelay = 100;
 unsigned char *LogBuffer = NULL;
 short verbose = FALSE;

@@ -95,8 +95,8 @@ int main(int argc, char **argv)
 
     if (argc == 0)
     {
-        // Opened from WB 
-        Information("Started from Workbench\n");
+        // Opened from WB
+        Information("Started from Workbench\n\n");
 
         // Read args from tooltip
         struct WBStartup *wbStartup = (struct WBStartup *)argv;
@@ -134,13 +134,13 @@ int main(int argc, char **argv)
                 STRPTR AlignXTT = FindToolType(iconSnapDiskObject->do_ToolTypes, "ALIGNX");
                 if (AlignXTT)
                 {
-                    Information("AlignXTT: %s\n", AlignXTT);
+                    // Information("AlignXTT: %s\n", AlignXTT);
                     AlignX = strtol(AlignXTT, NULL, 10);
                 }
                 STRPTR AlignYTT = FindToolType(iconSnapDiskObject->do_ToolTypes, "ALIGNY");
                 if (AlignYTT)
                 {
-                    Information("AlignYTT: %s\n", AlignYTT);
+                    // Information("AlignYTT: %s\n", AlignYTT);
                     AlignY = strtol(AlignYTT, NULL, 10);
                 }
                 STRPTR CenterXTT = FindToolType(iconSnapDiskObject->do_ToolTypes, "CENTERX");
@@ -153,10 +153,9 @@ int main(int argc, char **argv)
                 {
                     BottomY = TRUE;
                 }
-               
             }
             CurrentDir(oldDir);
-            
+
             Verbose(" PADLEFT %li\n", PaddingLeft);
             Verbose(" PADTOP %li\n", PaddingTop);
             Verbose(" ALIGNX %li\n", AlignX);
@@ -166,11 +165,17 @@ int main(int argc, char **argv)
         }
 
         // No tools selected?
+        if (argc <= 1)
+        {
+            Information("Use IconSnap from Workbench by Shift-clicking on the Icons\n");
+            Information("you want to SnapShot, and double click on IconSnap\n");
+            exit(RETURN_OK);
+        }
+
 
         // Iterate parameters
         LONG numArgs = wbStartup->sm_NumArgs;
         Verbose("Number of arguments received = %ld\n", numArgs);
-
 
         // for (LONG i = 0; i < numArgs; i++)
         // {
@@ -198,7 +203,7 @@ int main(int argc, char **argv)
         // }
 
         exit(RETURN_OK);
-    }    
+    }
 
     // check arguments
     rdargs = ReadArgs(argumentString, argArray, NULL);
